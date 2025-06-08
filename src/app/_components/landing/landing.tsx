@@ -36,7 +36,7 @@ export const Landing = () => {
   return (
     <div className="from-background via-background to-muted min-h-screen bg-gradient-to-br">
       {" "}
-      <header className="container mx-auto px-4 py-6">
+      <header className="sticky top-0 z-50 container mx-auto bg-transparent px-4 py-6 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600" />
