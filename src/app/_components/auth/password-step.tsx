@@ -6,6 +6,10 @@ import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const createPasswordSchema = z
   .object({
@@ -28,6 +32,7 @@ type EnterPasswordFormValues = z.infer<typeof enterPasswordSchema>;
 
 export const PasswordStep = () => {
   const { setStep, email, step } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const isCreatePassword = step === AuthStep.CREATE_PASSWORD;
 
   const form = useForm<CreatePasswordFormValues | EnterPasswordFormValues>({
@@ -41,10 +46,39 @@ export const PasswordStep = () => {
     },
   });
 
-  const onSubmit = (
+  const onSubmit = async (
     values: CreatePasswordFormValues | EnterPasswordFormValues,
   ) => {
-    console.log(values);
+    setIsLoading(true);
+    if (isCreatePassword) {
+      try {
+        const { data, error } = await authClient.signUp.email(
+          {
+            email: values.email,
+            password: values.password,
+            callbackURL: "/panel",
+          },
+          {},
+        );
+        toast("Pomyślnie utworzono konto");
+      } catch (error) {
+        console.log(error);
+        toast("Nie udało się utworzyć konta");
+      }
+    } else {
+      try {
+        const { data, error } = await authClient.signIn.email({
+          email: values.email,
+          password: values.password,
+          callbackURL: "/panel",
+        });
+        toast("Pomyślnie zalogowano");
+      } catch (error) {
+        console.log(error);
+        toast("Nie udało się zalogować");
+      }
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -89,8 +123,16 @@ export const PasswordStep = () => {
           </>
         )}
       </div>
-      <Button type="submit" className="flex w-full items-center space-x-2">
-        Dalej
+      <Button
+        type="submit"
+        className="flex w-full items-center space-x-2"
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <span>Dalej</span>
+        )}
       </Button>
     </form>
   );

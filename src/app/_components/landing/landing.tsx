@@ -67,7 +67,7 @@ export const Landing = () => {
               size="lg"
               className="px-8 py-3 text-lg"
             >
-              <Link href="/app">Jestem organizatorem</Link>
+              <Link href="/auth">Jestem organizatorem</Link>
             </Button>
           </div>
         </div>

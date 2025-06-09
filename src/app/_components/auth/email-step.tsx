@@ -2,11 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEmailStep } from "./email-step.hooks";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
+import { api } from "@/trpc/react";
 
 type EmailFormValues = z.infer<typeof emailSchema>;
 const emailSchema = z.object({
@@ -22,9 +22,25 @@ export const EmailStep = () => {
     },
   });
 
-  const onSubmit = (values: EmailFormValues) => {
-    setStep(AuthStep.ENTER_PASSWORD);
-    setEmail(values.email);
+  const checkUserExists = api.user.checkIfUserExists.useQuery(
+    { email: form.watch("email") },
+    { enabled: false },
+  );
+
+  const onSubmit = async (values: EmailFormValues) => {
+    try {
+      const result = await checkUserExists.refetch();
+      const isUserExists = result.data;
+
+      if (isUserExists) {
+        setStep(AuthStep.ENTER_PASSWORD);
+      } else {
+        setStep(AuthStep.CREATE_PASSWORD);
+      }
+      setEmail(values.email);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -43,7 +59,11 @@ export const EmailStep = () => {
           </p>
         )}
       </div>
-      <Button type="submit" className="flex w-full items-center space-x-2">
+      <Button
+        type="submit"
+        className="flex w-full items-center space-x-2"
+        disabled={checkUserExists.isFetching}
+      >
         Dalej
       </Button>
     </form>
