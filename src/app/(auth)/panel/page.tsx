@@ -1,3 +1,5 @@
-export default async function Panel() {
-  return <div>asd</div>;
+import { Panel } from "@/app/_components/panel/Panel";
+
+export default async function PanelPage() {
+  return <Panel />;
 }
