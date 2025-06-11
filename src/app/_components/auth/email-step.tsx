@@ -31,7 +31,7 @@ export const EmailStep = () => {
     try {
       const result = await checkUserExists.refetch();
       const isUserExists = result.data;
-
+      console.log(isUserExists);
       if (isUserExists) {
         setStep(AuthStep.ENTER_PASSWORD);
       } else {

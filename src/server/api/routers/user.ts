@@ -11,6 +11,7 @@ export const userRouter = createTRPCRouter({
       const isUserExists = await ctx.db.query.user.findFirst({
         where: eq(user.email, input.email),
       });
-      return isUserExists !== null;
+      console.log(!!isUserExists);
+      return !!isUserExists;
     }),
 });

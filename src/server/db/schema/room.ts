@@ -13,7 +13,7 @@ export const rooms = pgTable("room", (d) => ({
     .notNull(),
   updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
   userId: d
-    .integer()
+    .text()
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
 }));

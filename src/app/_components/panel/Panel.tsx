@@ -2,8 +2,11 @@ import React from "react";
 import { Rooms } from "./rooms";
 import { PanelChat } from "./panel-chat";
 import { CreateRoomTile } from "./create-room-tile";
+import { getServerSession, protectedRoute } from "@/lib/server-only";
 
-export const Panel = () => {
+export const Panel = async () => {
+  const session = await getServerSession();
+  console.log(session);
   return (
     <div className="relative h-[calc(100vh-88px)]">
       <div className="from-background via-background to-muted absolute inset-0 -z-20 bg-gradient-to-br" />

@@ -30,7 +30,6 @@ CREATE TABLE "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
-	"image" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
@@ -61,12 +60,9 @@ CREATE TABLE "room" (
 	"roomCode" varchar(7) NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updatedAt" timestamp with time zone,
-	"userId" integer NOT NULL
+	"userId" text NOT NULL
 );
 --> statement-breakpoint
-DROP TABLE "live-feedback-wall_message" CASCADE;--> statement-breakpoint
-DROP TABLE "live-feedback-wall_room" CASCADE;--> statement-breakpoint
-DROP TABLE "live-feedback-wall_user" CASCADE;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "message" ADD CONSTRAINT "message_roomId_room_id_fk" FOREIGN KEY ("roomId") REFERENCES "public"."room"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
