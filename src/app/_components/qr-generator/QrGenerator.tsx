@@ -9,7 +9,7 @@ interface QRGeneratorProps {
 
 export default function QRGenerator({ roomId }: QRGeneratorProps) {
   const { Canvas } = useQRCode();
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/room/join?id=${roomId}`;
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomIdid=${roomId}`;
 
   return (
     <div>

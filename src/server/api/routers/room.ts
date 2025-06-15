@@ -6,6 +6,7 @@ import {
 } from "@/server/api/trpc";
 import { rooms, messages } from "@/server/db/schema";
 import { and, eq, lt, desc } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 
 const generateRoomCode = () => {
   const chars =
@@ -76,6 +77,26 @@ export const roomRouter = createTRPCRouter({
         items: userRooms,
         nextCursor,
       };
+    }),
+  join: publicProcedure
+    .input(
+      z.object({
+        otp: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const room = await ctx.db.query.rooms.findFirst({
+        where: eq(rooms.roomCode, input.otp),
+      });
+
+      if (!room) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Pokój nie znaleziony",
+        });
+      }
+
+      return room;
     }),
 
   getMessages: publicProcedure
