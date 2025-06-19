@@ -10,6 +10,8 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { codeTranslator } from "@/utils/codeTranslator";
+import { useRouter } from "next/navigation";
 
 const createPasswordSchema = z
   .object({
@@ -35,6 +37,8 @@ export const PasswordStep = () => {
   const [isLoading, setIsLoading] = useState(false);
   const isCreatePassword = step === AuthStep.CREATE_PASSWORD;
 
+  const router = useRouter();
+
   const form = useForm<CreatePasswordFormValues | EnterPasswordFormValues>({
     resolver: zodResolver(
       isCreatePassword ? createPasswordSchema : enterPasswordSchema,
@@ -52,15 +56,16 @@ export const PasswordStep = () => {
     setIsLoading(true);
     if (isCreatePassword) {
       try {
-        const { data, error } = await authClient.signUp.email(
-          {
-            email: values.email,
-            password: values.password,
-            callbackURL: "/panel",
-          },
-          {},
-        );
+        const { data, error } = await authClient.signUp.email({
+          email: values.email,
+          password: values.password,
+          name: "",
+        });
+        if (error) {
+          throw error;
+        }
         toast("Pomyślnie utworzono konto");
+        router.push("/panel");
       } catch (error) {
         console.log(error);
         toast("Nie udało się utworzyć konta");
@@ -72,10 +77,15 @@ export const PasswordStep = () => {
           password: values.password,
           callbackURL: "/panel",
         });
+        if (error) {
+          throw error;
+        }
         toast("Pomyślnie zalogowano");
       } catch (error) {
-        console.log(error);
-        toast("Nie udało się zalogować");
+        const description = codeTranslator(error.code);
+        toast("Nie udało się zalogować", {
+          description,
+        });
       }
     }
     setIsLoading(false);

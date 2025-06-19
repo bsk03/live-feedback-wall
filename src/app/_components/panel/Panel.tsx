@@ -20,7 +20,9 @@ export const Panel = async () => {
               <Rooms />
             </div>
           </div>
+          {/* <div className="w-full bg-red-500"> */}
           <PanelChat />
+          {/* </div> */}
         </div>
       </div>
     </div>
