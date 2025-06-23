@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { Poup } from "../popup/Poup";
 import QRGenerator from "../qr-generator/QrGenerator";
 import { toast } from "sonner";
+import { CopyButton } from "../shared/copy-button";
 
 type Props = {
   name: string;
@@ -71,23 +72,16 @@ export const RoomTile = ({
                   <p className="text-sm">Lub skopiuj link</p>
                   <div className="flex items-center gap-2">
                     <p className="text-muted-foreground text-sm">
-                      {`${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomIdid=${code}`}
+                      {`${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomId=${code}`}
                     </p>
-                    <button
-                      className="cursor-pointer"
+                    <CopyButton
                       onClick={() => {
-                        try {
-                          navigator.clipboard.writeText(
-                            `${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomIdid=${code}`,
-                          );
-                          toast.success("Link skopiowany do schowka");
-                        } catch (error) {
-                          console.error(error);
-                        }
+                        navigator.clipboard.writeText(
+                          `${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomId=${code}`,
+                        );
+                        toast.success("Link skopiowany do schowka");
                       }}
-                    >
-                      <Copy />
-                    </button>
+                    />
                   </div>
                 </div>
               </div>

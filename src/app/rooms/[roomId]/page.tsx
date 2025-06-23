@@ -17,7 +17,7 @@ const RoomPage = () => {
   //   });
   return (
     <div className="flex h-screen flex-col">
-      <Header isLogout={false} />
+      {/* <Header isLogout={false} /> */}
       <div className="h-full">
         <Room />
       </div>
