@@ -20,7 +20,7 @@ export const useInfiniteScroll = (
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleIntersection, {
-      rootMargin: "100px", // Trigger 100px before element is visible
+      rootMargin: "100px",
     });
 
     if (loadMoreRef.current) {

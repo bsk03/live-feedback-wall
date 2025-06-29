@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
 import { useParams } from "next/navigation";
 
-export const Room = () => {
+export const Room = ({
+  handleSendMessage,
+  messages,
+}: {
+  handleSendMessage: (message: string) => void;
+  messages: string[];
+}) => {
   const params = useParams();
   const roomId = (params?.roomId as string) || "1";
   const [message, setMessage] = useState("");
@@ -20,19 +26,19 @@ export const Room = () => {
   const { mutate: generateTestMessages } =
     api.message.generateTestMessages.useMutation();
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      sendMessage({
-        message: message.trim(),
-        roomId: parseInt(roomId),
-      });
-    }
-  };
+  // const handleSendMessage = () => {
+  //   if (message.trim()) {
+  //     sendMessage({
+  //       message: message.trim(),
+  //       roomId: parseInt(roomId),
+  //     });
+  //   }
+  // };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      // handleSendMessage();
     }
   };
 
@@ -53,7 +59,7 @@ export const Room = () => {
           Generate Test Messages
         </Button>
       </div>
-      <Chat />
+      <Chat messages={messages} />
       <div className="flex items-center gap-2 rounded-md border p-4">
         <Input
           value={message}
@@ -62,7 +68,10 @@ export const Room = () => {
           placeholder="Napisz wiadomość..."
           className="border-none bg-transparent outline-none"
         />
-        <Button onClick={handleSendMessage} disabled={!message.trim()}>
+        <Button
+          onClick={() => handleSendMessage(message)}
+          disabled={!message.trim()}
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>
