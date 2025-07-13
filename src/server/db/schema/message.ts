@@ -9,6 +9,7 @@ export const messages = pgTable("message", (d) => ({
     .references(() => rooms.id, { onDelete: "cascade" })
     .notNull(),
   content: d.varchar({ length: 256 }).notNull(),
+  sender: d.varchar({ length: 256 }).notNull(),
   createdAt: d
     .timestamp({ withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)

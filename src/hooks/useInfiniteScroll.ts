@@ -1,21 +1,27 @@
-import React, { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
+
+type UseInfiniteScrollOptions = {
+  onBeforeFetch?: () => void;
+};
 
 export const useInfiniteScroll = (
   fetchData: () => Promise<unknown>,
   hasMore: boolean,
+  options?: UseInfiniteScrollOptions,
 ) => {
-  const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const handleIntersection = React.useCallback(
+  const handleIntersection = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const isIntersecting = entries[0]?.isIntersecting;
       if (isIntersecting && hasMore) {
         (async () => {
+          options?.onBeforeFetch?.();
           await fetchData();
         })();
       }
     },
-    [fetchData, hasMore],
+    [fetchData, hasMore, options],
   );
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import { RoomTile } from "./room-tile";
 
 export const Rooms = () => {
   const searchParams = useSearchParams();
-  const selectedRoomId = searchParams.get("room");
+  const selectedRoomId = searchParams?.get("room");
   const router = useRouter();
 
   const selectRoom = (id: number) => {

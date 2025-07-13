@@ -1,65 +1,60 @@
-import React, { useState } from "react";
-import { Chat } from "./Chat";
-import { Input } from "@/components/ui/input";
-import { Send, Plus } from "lucide-react";
+import type { Message } from "@/app/rooms/[roomId]/page";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/trpc/react";
+import { Check, Loader2, Send } from "lucide-react";
 import { useParams } from "next/navigation";
+import React, { useState, type RefObject } from "react";
+import { Socket } from "socket.io-client";
+import { Chat } from "./Chat";
 
 export const Room = ({
   handleSendMessage,
   messages,
+  socket,
+  loadMoreRef,
+  lastMessageId,
 }: {
   handleSendMessage: (message: string) => void;
-  messages: string[];
+  messages: Message[];
+  socket: Socket;
+  loadMoreRef: RefObject<HTMLDivElement>;
+  lastMessageId: number | null;
 }) => {
   const params = useParams();
   const roomId = (params?.roomId as string) || "1";
   const [message, setMessage] = useState("");
 
-  const { mutate: sendMessage } = api.message.sendMessage.useMutation({
-    onSuccess: () => {
-      setMessage(""); // Clear input after sending
-    },
-  });
-
-  const { mutate: generateTestMessages } =
-    api.message.generateTestMessages.useMutation();
-
-  // const handleSendMessage = () => {
-  //   if (message.trim()) {
-  //     sendMessage({
-  //       message: message.trim(),
-  //       roomId: parseInt(roomId),
-  //     });
-  //   }
-  // };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      // handleSendMessage();
+      handleSendMessage(message);
+      setMessage("");
     }
   };
 
-  const handleGenerateTestMessages = () => {
-    generateTestMessages({ roomId: parseInt(roomId), count: 30 });
-  };
-
   return (
-    <div className="mx-auto flex h-full max-w-[1400px] flex-col gap-4 py-4">
+    <div className="container mx-auto flex h-full flex-col gap-4 px-4 py-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Room {roomId}</h2>
-        <Button
-          onClick={handleGenerateTestMessages}
-          variant="outline"
-          size="sm"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Generate Test Messages
-        </Button>
+        <div className="flex items-center gap-2">
+          {socket.connected ? (
+            <p className="flex flex-row items-center gap-2 text-sm text-green-500">
+              Połączono <Check className="h-4 w-4" />
+            </p>
+          ) : (
+            <p className="flex flex-row items-center gap-2 text-sm text-orange-500">
+              Łączenie <Loader2 className="h-4 w-4 animate-spin" />
+            </p>
+          )}
+        </div>
       </div>
-      <Chat messages={messages} />
+      <Chat
+        messages={messages}
+        socket={socket}
+        loadMoreRef={loadMoreRef}
+        lastMessageId={lastMessageId}
+      />
       <div className="flex items-center gap-2 rounded-md border p-4">
         <Input
           value={message}
@@ -69,7 +64,10 @@ export const Room = ({
           className="border-none bg-transparent outline-none"
         />
         <Button
-          onClick={() => handleSendMessage(message)}
+          onClick={() => {
+            handleSendMessage(message);
+            setMessage("");
+          }}
           disabled={!message.trim()}
         >
           <Send className="h-4 w-4" />

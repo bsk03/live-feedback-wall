@@ -3,45 +3,130 @@ import { Header } from "@/app/_components/landing/header";
 import { Room } from "@/app/_components/rooms/Room";
 import { checkRoom } from "@/utils/room";
 import { redirect, useParams } from "next/navigation";
-import { socket } from "@/lib/socketClient";
 import { useEffect, useState } from "react";
+import { api } from "@/trpc/react";
+import { useInfiniteScroll } from "@/hooks";
+import { useSocketRoom } from "@/hooks/useSocketRoom";
+import { Loader2 } from "lucide-react";
+
+export type Message = {
+  id: number;
+  content: string;
+  createdAt: Date;
+  sender: string;
+};
 
 const RoomPage = () => {
-  const { roomId }: { roomId: string } = useParams();
-  console.log("params", roomId);
-  const [messages, setMessages] = useState<string[]>([]);
+  const params = useParams();
+  const roomId = params?.roomId as string;
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [hasMore, setHasMore] = useState<boolean>(false);
+  const [lastMessageId, setLastMessageId] = useState<number | null>(null);
+  const {
+    data: messagesData,
+    isLoading: isLoadingMessages,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = api.message.getMessages.useInfiniteQuery(
+    {
+      roomId: parseInt(roomId),
+      perPage: 20,
+    },
+    {
+      enabled: !!roomId,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    },
+  );
+
   useEffect(() => {
-    // const isRoom = checkRoom(roomId);
-    // if (!isRoom) {
-    //   return redirect("/rooms/join");
-    // }
-    socket.on("message", (message: string) => {
-      console.log(`message ${message} received`);
+    if (messagesData?.pages) {
+      const allMessages = messagesData.pages.flatMap((page) => page.items);
+
+      const sortedMessages = [...allMessages].sort((a, b) => a.id - b.id);
+
+      setMessages(sortedMessages);
+      setHasMore(!!hasNextPage);
+      setLastMessageId(sortedMessages[0]?.id ?? null);
+    }
+  }, [messagesData, hasNextPage]);
+
+  const handleNewMessage = (data: { message: Message; sender: string }) => {
+    setMessages((prevMessages) => {
+      console.log("📝 Previous messages:", prevMessages);
+
+      const exists = prevMessages.some((msg) => msg.id === data.message.id);
+      if (exists) {
+        console.log("⚠️  Message already exists, skipping");
+        return prevMessages;
+      }
+
+      const newMessages = [...prevMessages, data.message].sort(
+        (a, b) => a.id - b.id,
+      );
+      console.log("✅ New messages array:", newMessages);
+      return newMessages;
     });
-    socket.on("user_joined", (userId: string) => {
-      console.log(`user ${userId} joined room ${roomId}`);
-    });
-    socket.emit("join-room", roomId);
-    return () => {
-      socket.off("user_joined");
-      socket.off("message");
-    };
-  }, [roomId]);
+  };
+
+  const { sendMessage, socket } = useSocketRoom({
+    roomId,
+    onMessage: handleNewMessage,
+    onUserJoined: (data) => {
+      console.log(`👋 User ${data.id} joined the room`);
+    },
+  });
+
+  const createMessage = api.message.sendMessage.useMutation({
+    onSuccess: (data) => {
+      if (data[0]) {
+        const messageData = {
+          id: data[0].id,
+          content: data[0].content,
+          sender: data[0].sender,
+          createdAt: new Date(),
+        };
+        sendMessage(messageData);
+      }
+    },
+    onError: (error) => {
+      console.error("❌ Error sending message:", error);
+    },
+  });
 
   const handleSendMessage = (message: string) => {
     if (message.trim() === "") return;
-    socket.emit("message", { roomId, message, sender: "user" });
-    setMessages([...messages, message]);
+
+    console.log("📝 Sending message:", message);
+    createMessage.mutate({
+      message,
+      roomId: parseInt(roomId),
+      sender: socket?.id || "",
+    });
   };
-  // const roomid = params.roomId;
-  //   const room = await db.query.rooms.findFirst({
-  // where: eq(rooms.roomCode, roomid),
-  //   });
+
+  const { loadMoreRef } = useInfiniteScroll(async () => {
+    if (!hasMore || isLoadingMessages || isFetchingNextPage) return;
+    console.log("fetching more messages");
+    await fetchNextPage();
+  }, hasMore);
+
   return (
     <div className="flex h-screen flex-col">
-      {/* <Header isLogout={false} /> */}
       <div className="h-full">
-        <Room handleSendMessage={handleSendMessage} messages={messages} />
+        {isLoadingMessages ? (
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <Room
+            handleSendMessage={handleSendMessage}
+            messages={messages}
+            socket={socket}
+            loadMoreRef={loadMoreRef}
+            lastMessageId={lastMessageId}
+          />
+        )}
       </div>
     </div>
   );

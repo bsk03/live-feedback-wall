@@ -1,28 +1,37 @@
-import { EyeOffIcon } from "lucide-react";
+import { forwardRef } from "react";
 
-type MessageType = {
-  message: string;
-  sent_at: Date;
-};
-
-export const Message = ({ message, sent_at }: MessageType) => {
-  const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat("pl-PL", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
+export const Message = forwardRef<
+  HTMLDivElement,
+  {
+    message: string;
+    sent_at: Date;
+    owner: boolean;
+  }
+>(({ message, sent_at, owner }, ref) => {
   return (
-    <div className="group w-[80%]">
-      <div className="rounded-md border p-4">{message}</div>
-      <div className="flex flex-row justify-between pt-2 pl-2">
-        <p className="text-sm text-gray-500">{formatTime(sent_at)}</p>
-        <button className="flex cursor-pointer flex-row items-center gap-2 border border-transparent text-sm text-red-500 opacity-0 group-hover:opacity-[100] hover:border-b-red-500">
-          Ukryj
-          <EyeOffIcon size={16} />
-        </button>
+    <div
+      ref={ref}
+      className={`flex w-full flex-col gap-2 ${
+        owner ? "items-end" : "items-start"
+      }`}
+    >
+      <div
+        className={`max-w-[70%] rounded-xl p-3 ${
+          owner
+            ? "bg-blue-500 text-white"
+            : "bg-gray-100 text-black dark:bg-gray-800 dark:text-white"
+        }`}
+      >
+        <p className="break-words">{message}</p>
       </div>
+      <p className="text-xs text-gray-500">
+        {sent_at.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </p>
     </div>
   );
-};
+});
+
+Message.displayName = "Message";

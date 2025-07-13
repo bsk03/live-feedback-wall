@@ -1,0 +1,1 @@
+ALTER TABLE "message" ADD COLUMN "sender" varchar(256) NOT NULL;

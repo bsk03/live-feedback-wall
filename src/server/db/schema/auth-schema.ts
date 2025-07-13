@@ -5,6 +5,7 @@ import { rooms } from "./room";
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
+  name: text("name").notNull(),
   emailVerified: boolean("email_verified")
     .$defaultFn(() => false)
     .notNull(),
