@@ -34,8 +34,8 @@ type EnterPasswordFormValues = z.infer<typeof enterPasswordSchema>;
 
 export const PasswordStep = () => {
   const { setStep, email, step } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(false);
   const isCreatePassword = step === AuthStep.CREATE_PASSWORD;
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -69,6 +69,8 @@ export const PasswordStep = () => {
       } catch (error) {
         console.log(error);
         toast("Nie udało się utworzyć konta");
+      } finally {
+        setIsLoading(false);
       }
     } else {
       try {
@@ -81,14 +83,15 @@ export const PasswordStep = () => {
           throw error;
         }
         toast("Pomyślnie zalogowano");
-      } catch (error) {
-        const description = codeTranslator(error.code);
+      } catch (error: any) {
+        const description = codeTranslator(error?.code || "unknown_error");
         toast("Nie udało się zalogować", {
           description,
         });
+      } finally {
+        setIsLoading(false);
       }
     }
-    setIsLoading(false);
   };
 
   return (

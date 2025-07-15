@@ -1,6 +1,6 @@
 "use client";
-import { Header } from "@/app/_components/landing/header";
-import { Room } from "@/app/_components/rooms/Room";
+import { Header } from "@/components/landing/header";
+import { Room } from "@/components/rooms/Room";
 import { checkRoom } from "@/utils/room";
 import { redirect, useParams } from "next/navigation";
 import { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
-import { Header } from "@/app/_components/landing/header";
-import { RoomJoin } from "@/app/_components/rooms/RoomJoin";
+import { Header } from "@/components/landing/header";
+import { RoomJoin } from "@/components/rooms/RoomJoin";
 
 export default async function JoinRoom({
   searchParams,

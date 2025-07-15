@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
-import { ThemeProvider } from "./_components/theme";
+import { ThemeProvider } from "../components/theme";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {

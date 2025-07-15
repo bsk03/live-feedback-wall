@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { api } from "@/trpc/react";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 type EmailFormValues = z.infer<typeof emailSchema>;
 const emailSchema = z.object({
@@ -15,6 +17,7 @@ const emailSchema = z.object({
 
 export const EmailStep = () => {
   const { setStep, setEmail } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
@@ -29,6 +32,7 @@ export const EmailStep = () => {
 
   const onSubmit = async (values: EmailFormValues) => {
     try {
+      setIsLoading(true);
       const result = await checkUserExists.refetch();
       const isUserExists = result.data;
       console.log(isUserExists);
@@ -40,6 +44,8 @@ export const EmailStep = () => {
       setEmail(values.email);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,9 +68,13 @@ export const EmailStep = () => {
       <Button
         type="submit"
         className="flex w-full items-center space-x-2"
-        disabled={checkUserExists.isFetching}
+        disabled={checkUserExists.isFetching || isLoading}
       >
-        Dalej
+        {isLoading || checkUserExists.isFetching ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          "Dalej"
+        )}
       </Button>
     </form>
   );

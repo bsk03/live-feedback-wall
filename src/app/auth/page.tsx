@@ -1,4 +1,4 @@
-import { Auth } from "../_components/auth/auth";
+import { Auth } from "../../components/auth/auth";
 
 export default async function SignIn() {
   return <Auth />;
