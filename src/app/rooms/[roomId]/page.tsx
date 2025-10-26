@@ -1,8 +1,6 @@
 "use client";
-import { Header } from "@/components/landing/header";
 import { Room } from "@/components/rooms/Room";
-import { checkRoom } from "@/utils/room";
-import { redirect, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/trpc/react";
 import { useInfiniteScroll } from "@/hooks";
@@ -31,7 +29,7 @@ const RoomPage = () => {
   } = api.message.getMessages.useInfiniteQuery(
     {
       roomId: parseInt(roomId),
-      perPage: 20,
+      perPage: 10,
     },
     {
       enabled: !!roomId,
@@ -43,11 +41,17 @@ const RoomPage = () => {
     if (messagesData?.pages) {
       const allMessages = messagesData.pages.flatMap((page) => page.items);
 
-      const sortedMessages = [...allMessages].sort((a, b) => a.id - b.id);
+      console.log("📊 Total pages loaded:", messagesData.pages.length);
+      console.log("📊 Total messages loaded:", allMessages.length);
+      console.log("📊 hasNextPage:", hasNextPage);
 
-      setMessages(sortedMessages);
+      // Server returns in DESC order (newest first)
+      // Reverse to get ASC order (oldest first) for display
+      const reversedMessages = [...allMessages].reverse();
+
+      setMessages(reversedMessages);
       setHasMore(!!hasNextPage);
-      setLastMessageId(sortedMessages[0]?.id ?? null);
+      setLastMessageId(reversedMessages[0]?.id ?? null);
     }
   }, [messagesData, hasNextPage]);
 
@@ -105,11 +109,13 @@ const RoomPage = () => {
     });
   };
 
-  const { loadMoreRef } = useInfiniteScroll(async () => {
+  const handleLoadMore = async () => {
     if (!hasMore || isLoadingMessages || isFetchingNextPage) return;
-    console.log("fetching more messages");
+    console.log("📥 Fetching more messages...");
     await fetchNextPage();
-  }, hasMore);
+  };
+
+  const { loadMoreRef } = useInfiniteScroll();
 
   return (
     <div className="flex h-screen flex-col">
@@ -125,6 +131,8 @@ const RoomPage = () => {
             socket={socket}
             loadMoreRef={loadMoreRef}
             lastMessageId={lastMessageId}
+            isLoading={isFetchingNextPage}
+            onLoadMore={handleLoadMore}
           />
         )}
       </div>

@@ -4,9 +4,9 @@ type UseInfiniteScrollOptions = {
   onBeforeFetch?: () => void;
 };
 
-export const useInfiniteScroll = (
-  fetchData: () => Promise<unknown>,
-  hasMore: boolean,
+export const useInfiniteScroll = <T = unknown>(
+  fetchData?: () => Promise<T>,
+  hasMore?: boolean,
   options?: UseInfiniteScrollOptions,
 ) => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -14,7 +14,8 @@ export const useInfiniteScroll = (
   const handleIntersection = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const isIntersecting = entries[0]?.isIntersecting;
-      if (isIntersecting && hasMore) {
+      if (isIntersecting && hasMore && fetchData) {
+        console.log("🔄 IntersectionObserver triggered, loading more...");
         (async () => {
           options?.onBeforeFetch?.();
           await fetchData();
@@ -25,8 +26,11 @@ export const useInfiniteScroll = (
   );
 
   useEffect(() => {
+    if (!fetchData) return; // Don't create observer if fetchData is not provided
+
     const observer = new IntersectionObserver(handleIntersection, {
       rootMargin: "100px",
+      threshold: 0.1,
     });
 
     if (loadMoreRef.current) {
@@ -34,7 +38,7 @@ export const useInfiniteScroll = (
     }
 
     return () => observer.disconnect();
-  }, [handleIntersection]);
+  }, [handleIntersection, fetchData]);
 
   return { loadMoreRef };
 };

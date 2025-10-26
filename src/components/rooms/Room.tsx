@@ -1,11 +1,10 @@
 import type { Message } from "@/app/rooms/[roomId]/page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { api } from "@/trpc/react";
 import { Check, Loader2, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState, type RefObject } from "react";
-import { Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import { Chat } from "./Chat";
 
 export const Room = ({
@@ -14,12 +13,16 @@ export const Room = ({
   socket,
   loadMoreRef,
   lastMessageId,
+  isLoading,
+  onLoadMore,
 }: {
   handleSendMessage: (message: string) => void;
   messages: Message[];
   socket: Socket;
   loadMoreRef: RefObject<HTMLDivElement>;
   lastMessageId: number | null;
+  isLoading?: boolean;
+  onLoadMore?: () => void;
 }) => {
   const params = useParams();
   const roomId = (params?.roomId as string) || "1";
@@ -54,6 +57,8 @@ export const Room = ({
         socket={socket}
         loadMoreRef={loadMoreRef}
         lastMessageId={lastMessageId}
+        isLoading={isLoading}
+        onLoadMore={onLoadMore}
       />
       <div className="flex items-center gap-2 rounded-md border p-4">
         <Input

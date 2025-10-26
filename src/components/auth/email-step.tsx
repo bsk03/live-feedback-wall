@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type EmailFormValues = z.infer<typeof emailSchema>;
 const emailSchema = z.object({
@@ -44,6 +45,13 @@ export const EmailStep = () => {
       setEmail(values.email);
     } catch (error) {
       console.error(error);
+      const errorMessage =
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : undefined;
+      toast.error("Nie udało się sprawdzić użytkownika", {
+        description: errorMessage || "Spróbuj ponownie",
+      });
     } finally {
       setIsLoading(false);
     }

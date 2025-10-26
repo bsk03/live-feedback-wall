@@ -39,6 +39,12 @@ export const messageRouter = createTRPCRouter({
         conditions.push(lt(messages.id, input.cursor));
       }
 
+      console.log("🔍 Server getMessages called with:", {
+        roomId: input.roomId,
+        perPage: input.perPage,
+        cursor: input.cursor,
+      });
+
       const messagesData = await ctx.db
         .select({
           id: messages.id,
@@ -51,6 +57,8 @@ export const messageRouter = createTRPCRouter({
         .orderBy(desc(messages.id))
         .limit(input.perPage + 1);
 
+      console.log("🔍 Server returned messages count:", messagesData.length);
+
       let nextCursor: typeof input.cursor | undefined = undefined;
       let hasMore = false;
 
@@ -59,6 +67,12 @@ export const messageRouter = createTRPCRouter({
         nextCursor = nextItem!.id;
         hasMore = true;
       }
+
+      console.log("🔍 Server returning:", {
+        itemsCount: messagesData.length,
+        nextCursor,
+        hasMore,
+      });
 
       return {
         items: messagesData,

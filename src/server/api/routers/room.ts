@@ -5,7 +5,7 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { rooms, messages } from "@/server/db/schema";
-import { and, eq, lt, desc } from "drizzle-orm";
+import { and, eq, lt, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 const generateRoomCode = () => {
@@ -76,6 +76,40 @@ export const roomRouter = createTRPCRouter({
       return {
         items: userRooms,
         nextCursor,
+      };
+    }),
+
+  list: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().default(1),
+        limit: z.number().min(1).max(100).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit ?? 10;
+      const offset = (input.page - 1) * limit;
+
+      const [userRooms, totalCount] = await Promise.all([
+        ctx.db.query.rooms.findMany({
+          where: eq(rooms.userId, ctx.session.user.id),
+          orderBy: (rooms, { desc }) => [desc(rooms.id)],
+          limit,
+          offset,
+        }),
+        ctx.db
+          .select({ count: sql<number>`count(*)` })
+          .from(rooms)
+          .where(eq(rooms.userId, ctx.session.user.id)),
+      ]);
+
+      const totalPages = Math.ceil(totalCount[0].count / limit);
+
+      return {
+        items: userRooms,
+        totalCount: totalCount[0].count,
+        totalPages,
+        currentPage: input.page,
       };
     }),
   join: publicProcedure

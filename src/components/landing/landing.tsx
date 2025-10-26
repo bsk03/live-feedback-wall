@@ -59,7 +59,7 @@ export const Landing = () => {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className="px-8 py-3 text-lg">
-              <Link href="/app">Jestem uczestnikiem</Link>
+              <Link href="/rooms/join">Jestem uczestnikiem</Link>
             </Button>
             <Button
               asChild

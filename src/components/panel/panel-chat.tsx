@@ -50,7 +50,7 @@ export const PanelChat = ({ onShowMobilePanel }: PanelChatProps) => {
   } = api.message.getMessages.useInfiniteQuery(
     {
       roomId: selectedRoomId ? parseInt(selectedRoomId) : 0,
-      perPage: 20,
+      perPage: 10,
     },
     {
       enabled: !!selectedRoomId,
