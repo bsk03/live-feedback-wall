@@ -2,12 +2,7 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
-  experimental: {
-    serverComponentsExternalPackages: ["socket.io"],
-  },
-  middleware: {
-    runtime: "edge",
-  },
+  serverExternalPackages: ["socket.io"],
   async headers() {
     return [
       {
