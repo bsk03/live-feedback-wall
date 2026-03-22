@@ -64,7 +64,7 @@ export const RoomTile = ({
           >
             <div className="flex flex-col items-center justify-center gap-8">
               <QRGenerator
-                roomId={`${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomIdid=${code}`}
+                roomId={`${process.env.NEXT_PUBLIC_SITE_URL}/rooms/join?roomId=${code}`}
               />
               <div className="flex flex-col items-center justify-center gap-4">
                 <p className="text-5xl">{code}</p>

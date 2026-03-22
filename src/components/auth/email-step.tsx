@@ -10,6 +10,13 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { emailSchema, type EmailFormValues } from "@/utils/validation";
 
+import { toast } from "sonner";
+
+type EmailFormValues = z.infer<typeof emailSchema>;
+const emailSchema = z.object({
+  email: z.string().email("Nieprawidłowy adres email"),
+});
+
 export const EmailStep = () => {
   const { setStep, setEmail } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +46,13 @@ export const EmailStep = () => {
       setEmail(values.email);
     } catch (error) {
       console.error(error);
+      const errorMessage =
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : undefined;
+      toast.error("Nie udało się sprawdzić użytkownika", {
+        description: errorMessage || "Spróbuj ponownie",
+      });
     } finally {
       setIsLoading(false);
     }
