@@ -40,14 +40,14 @@ export const Room = ({
     <div className="container mx-auto flex h-full flex-col gap-4 px-4 py-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Room {roomId}</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" aria-live="polite">
           {socket.connected ? (
             <p className="flex flex-row items-center gap-2 text-sm text-green-500">
-              Połączono <Check className="h-4 w-4" />
+              Połączono <Check className="h-4 w-4" aria-hidden="true" />
             </p>
           ) : (
             <p className="flex flex-row items-center gap-2 text-sm text-orange-500">
-              Łączenie <Loader2 className="h-4 w-4 animate-spin" />
+              Łączenie <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             </p>
           )}
         </div>
@@ -61,12 +61,17 @@ export const Room = ({
         onLoadMore={onLoadMore}
       />
       <div className="flex items-center gap-2 rounded-md border p-4">
+        <label htmlFor="message-input" className="sr-only">
+          Treść wiadomości
+        </label>
         <Input
+          id="message-input"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Napisz wiadomość..."
           className="border-none bg-transparent outline-none"
+          aria-label="Wpisz wiadomość"
         />
         <Button
           onClick={() => {
@@ -74,8 +79,9 @@ export const Room = ({
             setMessage("");
           }}
           disabled={!message.trim()}
+          aria-label="Wyślij wiadomość"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
     </div>

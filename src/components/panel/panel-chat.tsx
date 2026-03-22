@@ -97,8 +97,9 @@ export const PanelChat = ({ onShowMobilePanel }: PanelChatProps) => {
             className="bg-primary rounded-md px-4 py-2 text-white lg:hidden"
             variant="outline"
             onClick={onShowMobilePanel}
+            aria-label="Otwórz listę pokoi"
           >
-            <ArrowLeftIcon className="h-4 w-4" />
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
             Pokaż listę pokoi
           </Button>
         </div>

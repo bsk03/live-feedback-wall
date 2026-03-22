@@ -59,12 +59,18 @@ export const RoomJoin = ({ roomId }: { roomId: string }) => {
     <>
       <div className="flex h-screen w-full flex-col items-center justify-center gap-10">
         <div className="flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold">Podaj kod do pokoju</h1>
-          <p>Wpisz w to miejsce kod dostępu do pokoju</p>
+          <h1 className="text-4xl font-bold" id="room-code-heading">
+            Podaj kod do pokoju
+          </h1>
+          <p id="room-code-description">
+            Wpisz w to miejsce kod dostępu do pokoju
+          </p>
         </div>
         <form
           className="flex flex-col items-center justify-center gap-10"
           onSubmit={form.handleSubmit(onSubmit)}
+          aria-labelledby="room-code-heading"
+          aria-describedby="room-code-description"
         >
           <OtpInput
             value={form.watch("otp")}
@@ -73,7 +79,9 @@ export const RoomJoin = ({ roomId }: { roomId: string }) => {
             }}
             numInputs={6}
             renderSeparator={(index) =>
-              index === 2 ? <span>-</span> : undefined
+              index === 2 ? (
+                <span aria-hidden="true">-</span>
+              ) : undefined
             }
             inputStyle={{
               width: "50px",
@@ -84,7 +92,12 @@ export const RoomJoin = ({ roomId }: { roomId: string }) => {
               textAlign: "center",
               margin: "0 10px",
             }}
-            renderInput={(props) => <Input {...props} />}
+            renderInput={(props, index) => (
+              <Input
+                {...props}
+                aria-label={`Znak ${index + 1} kodu pokoju`}
+              />
+            )}
           />
           <Button
             className="w-3/5"

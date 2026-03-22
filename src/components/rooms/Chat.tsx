@@ -115,14 +115,11 @@ export const Chat = ({
 
   return (
     <div
-      ref={chatContainerRef}
       className="flex h-full w-full flex-1 flex-col-reverse overflow-y-auto rounded-md border p-4"
+      role="log"
+      aria-label="Lista wiadomości"
+      aria-live="polite"
     >
-      {isLoading && (
-        <div className="flex justify-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
-      )}
       <div className="space-y-4">
         <div className="h-px w-full" ref={loadMoreRef} />
         {messages.map(({ id, content, createdAt, sender }) => (

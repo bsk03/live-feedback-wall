@@ -5,13 +5,19 @@ import { Label } from "@/components/ui/label";
 import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { codeTranslator } from "@/utils/codeTranslator";
 import { useRouter } from "next/navigation";
+import {
+  createPasswordSchema,
+  enterPasswordSchema,
+  type CreatePasswordFormValues,
+  type EnterPasswordFormValues,
+} from "@/utils/validation";
+
 
 const createPasswordSchema = z
   .object({

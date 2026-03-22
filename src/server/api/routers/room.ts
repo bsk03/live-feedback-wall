@@ -7,18 +7,7 @@ import {
 import { rooms, messages } from "@/server/db/schema";
 import { and, eq, lt, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-
-const generateRoomCode = () => {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const firstPart = Array.from({ length: 3 }, () =>
-    chars.charAt(Math.floor(Math.random() * chars.length)),
-  ).join("");
-  const secondPart = Array.from({ length: 3 }, () =>
-    chars.charAt(Math.floor(Math.random() * chars.length)),
-  ).join("");
-  return `${firstPart}-${secondPart}`;
-};
+import { generateRoomCode } from "@/utils/roomCode";
 
 export const roomRouter = createTRPCRouter({
   create: protectedProcedure

@@ -37,18 +37,29 @@ export const Landing = () => {
     <div className="from-background via-background to-muted min-h-screen bg-gradient-to-br">
       {" "}
       <header className="sticky top-0 z-50 container mx-auto bg-transparent px-4 py-6 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600" />
-            <h1 className="text-2xl font-bold">Live Feedback Wall</h1>
-          </div>
+        <nav aria-label="Nawigacja główna">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div
+                className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600"
+                aria-hidden="true"
+              />
+              <h1 className="text-2xl font-bold">Live Feedback Wall</h1>
+            </div>
 
-          <ThemeToggle />
-        </div>
+            <ThemeToggle />
+          </div>
+        </nav>
       </header>
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section
+        className="container mx-auto px-4 py-20 text-center"
+        aria-labelledby="hero-heading"
+      >
         <div className="mx-auto max-w-4xl">
-          <h2 className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-5xl font-bold text-transparent md:text-6xl">
+          <h2
+            id="hero-heading"
+            className="mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-5xl font-bold text-transparent md:text-6xl"
+          >
             Zbieraj opinię
             <br />w czasie rzeczywistym
           </h2>
@@ -146,8 +157,8 @@ export const Landing = () => {
           </Button>
         </div>
       </section>
-      <footer className="mt-20 border-t">
-        <div className="text-muted-foreground tex container mx-auto px-4 py-8 text-center">
+      <footer className="mt-20 border-t" role="contentinfo">
+        <div className="text-muted-foreground container mx-auto px-4 py-8 text-center">
           <p>
             &copy; {new Date().getFullYear()} Live Feedback Wall. Created by
             <Link

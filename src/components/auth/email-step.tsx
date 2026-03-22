@@ -2,13 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { emailSchema, type EmailFormValues } from "@/utils/validation";
+
 import { toast } from "sonner";
 
 type EmailFormValues = z.infer<typeof emailSchema>;
