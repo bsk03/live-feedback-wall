@@ -38,8 +38,9 @@ export const Panel = () => {
                   size="icon"
                   className="h-8 w-8 p-0"
                   onClick={() => setIsMobilePanelOpen(false)}
+                  aria-label="Zamknij panel pokoi"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-6 w-6" aria-hidden="true" />
                 </Button>
               </div>
               <div className="flex-shrink-0">

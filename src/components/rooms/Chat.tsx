@@ -27,7 +27,12 @@ export const Chat = ({
   }, [lastMessageId, messages]);
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col-reverse overflow-y-auto rounded-md border p-4">
+    <div
+      className="flex h-full w-full flex-1 flex-col-reverse overflow-y-auto rounded-md border p-4"
+      role="log"
+      aria-label="Lista wiadomości"
+      aria-live="polite"
+    >
       <div className="space-y-4">
         <div className="h-px w-full" ref={loadMoreRef} />
         {messages.map(({ id, content, createdAt, sender }) => (

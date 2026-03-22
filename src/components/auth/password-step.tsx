@@ -5,32 +5,18 @@ import { Label } from "@/components/ui/label";
 import { AuthStep, useAuthStore } from "@/store/authStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { codeTranslator } from "@/utils/codeTranslator";
 import { useRouter } from "next/navigation";
-
-const createPasswordSchema = z
-  .object({
-    email: z.string().email("Nieprawidłowy adres email"),
-    password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków"),
-    confirmPassword: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Hasła nie są takie same",
-    path: ["confirmPassword"],
-  });
-
-const enterPasswordSchema = z.object({
-  email: z.string().email("Nieprawidłowy adres email"),
-  password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków"),
-});
-
-type CreatePasswordFormValues = z.infer<typeof createPasswordSchema>;
-type EnterPasswordFormValues = z.infer<typeof enterPasswordSchema>;
+import {
+  createPasswordSchema,
+  enterPasswordSchema,
+  type CreatePasswordFormValues,
+  type EnterPasswordFormValues,
+} from "@/utils/validation";
 
 export const PasswordStep = () => {
   const { setStep, email, step } = useAuthStore();
