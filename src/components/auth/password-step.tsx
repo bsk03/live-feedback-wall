@@ -18,35 +18,6 @@ import {
   type EnterPasswordFormValues,
 } from "@/utils/validation";
 
-
-const createPasswordSchema = z
-  .object({
-    email: z.string().email("Nieprawidłowy adres email"),
-    password: z
-      .string()
-      .min(8, "Hasło musi mieć co najmniej 8 znaków")
-      .regex(/[A-Z]/, "Hasło musi zawierać co najmniej jedną wielką literę")
-      .regex(/[a-z]/, "Hasło musi zawierać co najmniej jedną małą literę")
-      .regex(/[0-9]/, "Hasło musi zawierać co najmniej jedną cyfrę")
-      .regex(
-        /[^A-Za-z0-9]/,
-        "Hasło musi zawierać co najmniej jeden znak specjalny",
-      ),
-    confirmPassword: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Hasła nie są takie same",
-    path: ["confirmPassword"],
-  });
-
-const enterPasswordSchema = z.object({
-  email: z.string().email("Nieprawidłowy adres email"),
-  password: z.string().min(1, "Hasło jest wymagane"),
-});
-
-type CreatePasswordFormValues = z.infer<typeof createPasswordSchema>;
-type EnterPasswordFormValues = z.infer<typeof enterPasswordSchema>;
-
 export const PasswordStep = () => {
   const { email, step } = useAuthStore();
   const isCreatePassword = step === AuthStep.CREATE_PASSWORD;

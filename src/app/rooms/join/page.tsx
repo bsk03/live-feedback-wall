@@ -4,7 +4,7 @@ import { RoomJoin } from "@/components/rooms/RoomJoin";
 export default async function JoinRoom({
   searchParams,
 }: {
-  searchParams: { roomId: string };
+  searchParams: Promise<{ roomId: string }>;
 }) {
   const { roomId } = await searchParams;
 

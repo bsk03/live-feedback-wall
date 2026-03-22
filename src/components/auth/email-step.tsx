@@ -9,13 +9,7 @@ import { api } from "@/trpc/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { emailSchema, type EmailFormValues } from "@/utils/validation";
-
 import { toast } from "sonner";
-
-type EmailFormValues = z.infer<typeof emailSchema>;
-const emailSchema = z.object({
-  email: z.string().email("Nieprawidłowy adres email"),
-});
 
 export const EmailStep = () => {
   const { setStep, setEmail } = useAuthStore();

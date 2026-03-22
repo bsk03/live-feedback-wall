@@ -15,6 +15,7 @@ const MESSAGE_LIMIT = 30; // max wiadomości
 const MESSAGE_WINDOW_MS = 60_000; // w ciągu 60 sekund
 const messageCounts = new Map();
 
+/** @param {string} socketId */
 function isRateLimited(socketId) {
   const now = Date.now();
   const entry = messageCounts.get(socketId);

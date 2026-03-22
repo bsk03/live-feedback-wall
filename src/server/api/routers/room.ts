@@ -92,11 +92,12 @@ export const roomRouter = createTRPCRouter({
           .where(eq(rooms.userId, ctx.session.user.id)),
       ]);
 
-      const totalPages = Math.ceil(totalCount[0].count / limit);
+      const total = totalCount[0]?.count ?? 0;
+      const totalPages = Math.ceil(total / limit);
 
       return {
         items: userRooms,
-        totalCount: totalCount[0].count,
+        totalCount: total,
         totalPages,
         currentPage: input.page,
       };
@@ -151,6 +152,7 @@ export const roomRouter = createTRPCRouter({
       await ctx.db.insert(messages).values({
         roomId: input.roomId,
         content: input.content,
+        sender: "anonymous",
       });
     }),
 });
