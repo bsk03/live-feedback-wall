@@ -235,3 +235,163 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 | **Scenariusz użycia** | Tomek skanuje QR code wyświetlony na slajdzie, wpisuje 6-znakowy kod, pisze pytanie. Prowadzący widzi je na swoim panelu i odpowiada na nie w trakcie wykładu. |
 
 \newpage
+
+## 8. Przypadki użycia
+
+### Lista przypadków użycia
+
+| ID    | Przypadek użycia                   | Aktor                  |
+| ----- | ---------------------------------- | ---------------------- |
+| PU-01 | Rejestracja organizatora           | Organizator            |
+| PU-02 | Logowanie organizatora             | Organizator            |
+| PU-03 | Wylogowanie organizatora           | Organizator            |
+| PU-04 | Tworzenie pokoju                   | Organizator            |
+| PU-05 | Przeglądanie listy pokoi           | Organizator            |
+| PU-06 | Udostępnianie kodu pokoju / QR     | Organizator            |
+| PU-07 | Podgląd wiadomości w panelu        | Organizator            |
+| PU-08 | Dołączanie do pokoju przez kod     | Uczestnik              |
+| PU-09 | Wysyłanie wiadomości               | Uczestnik              |
+| PU-10 | Przełączanie motywu (ciemny/jasny) | Organizator, Uczestnik |
+
+### a) Diagram przypadków użycia
+
+![Diagram przypadków użycia](images/use-case-diagram.png)
+
+**Opis:** Diagram UML przedstawiający dwóch aktorów (Organizator, Uczestnik) oraz ich przypadki użycia. Organizator ma dostęp do PU-01 - PU-07 i PU-10. Uczestnik ma dostęp do PU-08 - PU-10.
+
+### b) Scenariusz przypadku użycia [BK]
+
+**PU-08: Dołączanie do pokoju przez kod**
+
+| Element             | Opis                                                                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Aktor główny**    | Uczestnik                                                                                                                            |
+| **Cel**             | Dołączenie do istniejącego pokoju feedback wall                                                                                      |
+| **Warunki wstępne** | Uczestnik posiada 6-znakowy kod pokoju (otrzymany od organizatora lub zeskanowany z QR). Pokój o podanym kodzie istnieje w systemie. |
+| **Warunki końcowe** | Uczestnik znajduje się w pokoju i może wysyłać wiadomości.                                                                           |
+
+**Scenariusz główny:**
+
+1. Uczestnik otwiera stronę dołączania do pokoju (`/rooms/join`).
+2. System wyświetla formularz z 6 polami na znaki kodu.
+3. Uczestnik wpisuje 6-znakowy kod pokoju.
+4. Uczestnik klika przycisk "Dalej".
+5. System waliduje kod (format XXX-XXX).
+6. System wyszukuje pokój w bazie danych.
+7. System zapisuje dane pokoju w localStorage przeglądarki.
+8. System przekierowuje uczestnika do widoku pokoju (`/rooms/[id]`).
+9. System nawiązuje połączenie WebSocket i dołącza do pokoju.
+10. Uczestnik widzi historię wiadomości i może wysyłać nowe.
+
+**Scenariusz alternatywny:**
+
+- 5a. Kod ma nieprawidłowy format - przycisk "Dalej" jest nieaktywny.
+- 6a. Pokój o podanym kodzie nie istnieje - system wyświetla komunikat "Błąd podczas dołączania do pokoju".
+
+\newpage
+
+## 9. Baza danych
+
+### a) Model koncepcyjny
+
+![Model koncepcyjny](images/erd-koncepcyjny.png)
+
+**Opis:** Diagram przedstawiający encje i relacje bez atrybutów. Encje: User, Room, Message, Session, Account, Verification. Relacje: User 1:N Room, Room 1:N Message, User 1:N Session, User 1:N Account.
+
+### b) Model logiczny
+
+![Model logiczny](images/erd-logiczny.png)
+
+**Opis:** Diagram ERD z atrybutami i typami danych. Każda encja jako prostokąt z listą kolumn (nazwa, typ, PK/FK/NOT NULL). Relacje oznaczone liniami z krotnościami.
+
+### c) Model fizyczny
+
+Model fizyczny bazy danych zaimplementowany jest w dialekcie PostgreSQL. Pełny kod SQL znajduje się w repozytorium:
+
+- **Standard SQL (ANSI):** [`sql/standard.sql`](../sql/standard.sql)
+- **Dialekt PostgreSQL:** [`sql/postgresql.sql`](../sql/postgresql.sql)
+
+Schemat bazy definiowany jest w kodzie za pomocą Drizzle ORM:
+
+- [`src/server/db/schema/auth-schema.ts`](../src/server/db/schema/auth-schema.ts) - tabele autentykacji (user, session, account, verification)
+- [`src/server/db/schema/room.ts`](../src/server/db/schema/room.ts) - tabela pokoi
+- [`src/server/db/schema/message.ts`](../src/server/db/schema/message.ts) - tabela wiadomości
+
+Migracje generowane automatycznie przez Drizzle Kit znajdują się w katalogu `drizzle/`.
+
+\newpage
+
+## 10. Diagramy sekwencji
+
+### Lista diagramów sekwencji
+
+| ID    | Diagram                        | Opis                                                                      |
+| ----- | ------------------------------ | ------------------------------------------------------------------------- |
+| DS-01 | Rejestracja organizatora       | Przepływ: formularz → sprawdzenie email → utworzenie konta → sesja        |
+| DS-02 | Logowanie organizatora         | Przepływ: formularz → walidacja hasła → utworzenie sesji → przekierowanie |
+| DS-03 | Tworzenie pokoju               | Przepływ: formularz → generowanie kodu → zapis w DB → odświeżenie listy   |
+| DS-04 | Dołączanie do pokoju           | Przepływ: kod OTP → walidacja → zapis w localStorage → WebSocket join     |
+| DS-05 | Wysyłanie wiadomości real-time | Przepływ: input → tRPC mutation → DB insert → Socket.IO emit → broadcast  |
+
+### Diagram sekwencji: Wysyłanie wiadomości w czasie rzeczywistym (DS-05) [BK]
+
+![Diagram sekwencji - wysyłanie wiadomości](images/sequence-message.png)
+
+**Opis:** Diagram przedstawiający przepływ wysyłania wiadomości od momentu wpisania tekstu przez uczestnika do wyświetlenia u wszystkich użytkowników pokoju.
+
+_Przepływ:_
+
+1. _Uczestnik → Przeglądarka: wpisuje wiadomość i naciska Enter_
+2. _Przeglądarka → tRPC API: `message.sendMessage({ roomId, content, sender })`_
+3. _tRPC API → Baza danych: `INSERT INTO message (...)`_
+4. _Baza danych → tRPC API: potwierdzenie zapisu (zwraca id)_
+5. _tRPC API → Przeglądarka: sukces (dane wiadomości)_
+6. _Przeglądarka → Socket.IO Server: `emit("message", { roomId, message })`_
+7. _Socket.IO Server → Inni uczestnicy: `broadcast("message", { message })`_
+8. _Inni uczestnicy: wyświetlenie wiadomości w czacie_
+
+\newpage
+
+## 11. Diagramy aktywności
+
+### Lista diagramów aktywności
+
+| ID    | Diagram              | Opis                                                      |
+| ----- | -------------------- | --------------------------------------------------------- |
+| DA-01 | Proces autentykacji  | Email → sprawdzenie istnienia → logowanie lub rejestracja |
+| DA-02 | Dołączanie do pokoju | Wpisanie kodu → walidacja → połączenie WebSocket          |
+| DA-03 | Moderacja wiadomości | Podgląd wiadomości → decyzja o usunięciu → soft delete    |
+
+### Diagram aktywności: Proces autentykacji (DA-01) [BK]
+
+![Diagram aktywności - autentykacja](images/activity-auth.png)
+
+**Opis:** Diagram przedstawiający przepływ procesu autentykacji od wpisania emaila przez użytkownika do przekierowania na panel organizatora.
+
+_Przepływ:_
+
+\newpage
+
+## 12. Diagramy stanów
+
+### Lista diagramów stanów
+
+| ID     | Diagram                       | Opis                                             |
+| ------ | ----------------------------- | ------------------------------------------------ |
+| DST-01 | Stany wiadomości              | Cykl życia wiadomości od utworzenia do usunięcia |
+| DST-02 | Stany połączenia WebSocket    | Connected, Disconnected, Reconnecting            |
+| DST-03 | Stany formularza autentykacji | EMAIL → ENTER_PASSWORD / CREATE_PASSWORD         |
+
+### Diagram stanów: Stany wiadomości (DST-01) [BK]
+
+![Diagram stanów - wiadomość](images/state-message.png)
+
+**Opis:** Diagram stanów UML przedstawiający cykl życia obiektu Message w systemie.
+
+**Opis stanów:**
+
+| Stan                   | Pole `deleted` | Pole `deletedAt` | Widoczność                                 |
+| ---------------------- | -------------- | ---------------- | ------------------------------------------ |
+| Utworzona              | `false`        | `null`           | Widoczna w bazie, jeszcze nie rozesłana    |
+| Wyświetlona            | `false`        | `null`           | Widoczna dla wszystkich uczestników pokoju |
+| Usunięta (soft delete) | `true`         | `<timestamp>`    | Ukryta z widoku, nadal w bazie danych      |
