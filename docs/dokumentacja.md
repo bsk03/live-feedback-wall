@@ -99,10 +99,10 @@ Projekt obejmuje:
 
 ### Odbiorca docelowy
 
-- **Prowadzący prezentacje i wykłady** — zbieranie pytań i opinii od publiczności
-- **Moderatorzy warsztatów** — interakcja z uczestnikami w czasie rzeczywistym
-- **Organizatorzy spotkań firmowych** — anonimowe zbieranie feedbacku od pracowników
-- **Wykładowcy akademiccy** — angażowanie studentów podczas zajęć
+- **Prowadzący prezentacje i wykłady** - zbieranie pytań i opinii od publiczności
+- **Moderatorzy warsztatów** - interakcja z uczestnikami w czasie rzeczywistym
+- **Organizatorzy spotkań firmowych** - anonimowe zbieranie feedbacku od pracowników
+- **Wykładowcy akademiccy** - angażowanie studentów podczas zajęć
 
 ### Linki
 
@@ -395,3 +395,259 @@ _Przepływ:_
 | Utworzona              | `false`        | `null`           | Widoczna w bazie, jeszcze nie rozesłana    |
 | Wyświetlona            | `false`        | `null`           | Widoczna dla wszystkich uczestników pokoju |
 | Usunięta (soft delete) | `true`         | `<timestamp>`    | Ukryta z widoku, nadal w bazie danych      |
+
+## 13. Dokumentacja bezpieczeństwa
+
+### Bezpieczeństwo danych podczas składowania
+
+| Mechanizm | Opis |
+|-----------|------|
+| **Hashowanie haseł** | Better Auth automatycznie hashuje hasła algorytmem bcrypt przed zapisem do bazy danych. Hasła nigdy nie są przechowywane w postaci jawnej. |
+| **Szyfrowanie bazy danych** | Neon PostgreSQL wymusza połączenia SSL/TLS. Dane przechowywane są na zaszyfrowanych dyskach. |
+| **Walidacja siły hasła** | Hasło musi zawierać min. 8 znaków, wielką literę, małą literę, cyfrę i znak specjalny. Walidacja po stronie klienta (Zod) i serwera. |
+| **Soft delete** | Wiadomości nie są fizycznie usuwane z bazy - ustawiana jest flaga `deleted = true` i `deletedAt = timestamp`. Umożliwia to ewentualny audyt. |
+
+### Bezpieczeństwo danych podczas przesyłania
+
+| Mechanizm | Opis |
+|-----------|------|
+| **HTTPS** | Render wymusza HTTPS na wszystkich połączeniach. Certyfikat SSL/TLS generowany automatycznie. |
+| **WSS (WebSocket Secure)** | Socket.IO komunikuje się przez WSS (WebSocket over TLS) w środowisku produkcyjnym. |
+| **CORS** | Origin ograniczony do `NEXT_PUBLIC_SITE_URL` - tylko nasza domena może komunikować się z API. |
+| **Walidacja danych wejściowych** | Wszystkie dane walidowane schematami Zod po stronie klienta i serwera (tRPC). |
+| **Ograniczenie rozmiaru pakietu** | Socket.IO `maxHttpBufferSize` ustawiony na 1 KB- ochrona przed przesyłaniem dużych payloadów. |
+
+### Bezpieczeństwo w projekcie
+
+| Zasada | Implementacja |
+|--------|---------------|
+| **Secure by Design** | Security headers (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy) skonfigurowane w `next.config.js`. Rate limiting na Socket.IO (max 30 wiadomości/min). Walidacja wejścia na każdym endpointcie. |
+| **Privacy by Design** | Uczestnicy są anonimowi - nie wymagana rejestracja. System nie zbiera danych osobowych uczestników. Minimalizacja danych: przechowywane tylko treść wiadomości i identyfikator socketa. |
+| **Defence in Depth** | Walidacja na wielu warstwach: formularz (React Hook Form + Zod), API (tRPC + Zod), baza danych (constrainty PostgreSQL). Middleware Next.js chroni trasy `/panel` przed nieautoryzowanym dostępem. |
+
+### Nagłówki bezpieczeństwa HTTP
+
+| Nagłówek | Wartość | Cel |
+|----------|---------|-----|
+| `X-Frame-Options` | `DENY` | Ochrona przed clickjackingiem |
+| `X-Content-Type-Options` | `nosniff` | Zapobieganie MIME sniffingowi |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Kontrola nagłówka Referer |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | Blokada dostępu do kamery, mikrofonu, geolokalizacji |
+| `X-XSS-Protection` | `1; mode=block` | Ochrona przed XSS (starsze przeglądarki) |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` | Wymuszenie HTTPS |
+
+\newpage
+
+## 14. Dostępność (WCAG)
+
+### Deklaracja zgodności
+
+Aplikacja Live Feedback Wall została zaprojektowana z uwzględnieniem wytycznych WCAG 2.1 na poziomie AA. Poniżej przedstawiono zastosowane rozwiązania zwiększające dostępność.
+
+### Zastosowane rozwiązania
+
+| Obszar | Rozwiązanie | Lokalizacja |
+|--------|-------------|-------------|
+| **Język dokumentu** | `lang="pl"` na elemencie `<html>` | `src/app/layout.tsx` |
+| **Skip navigation** | Link "Przejdź do treści" widoczny przy fokusie (Tab), prowadzący do `#main-content` | `src/app/layout.tsx` |
+| **Semantyczny HTML** | `<main>`, `<nav>`, `<header>`, `<footer>`, `<section>` z `aria-labelledby` | Strona główna, panel, layout |
+| **Nawigacja klawiaturą** | Wszystkie interaktywne elementy dostępne przez Tab. Focus-visible na przyciskach i inputach. | Komponenty UI (shadcn/ui + Radix) |
+| **Przyciski icon-only** | `aria-label` na przyciskach zawierających tylko ikonę (wyloguj, wyślij, zamknij, motyw) | `header.tsx`, `Room.tsx`, `Panel.tsx` |
+| **Ikony dekoracyjne** | `aria-hidden="true"` na ikonach Lucide, które nie niosą treści | Wszystkie ikony dekoracyjne |
+| **Czat real-time** | `role="log"` i `aria-live="polite"` na kontenerze wiadomości - czytnik ekranu ogłasza nowe wiadomości | `Chat.tsx` |
+| **Status połączenia** | `aria-live="polite"` na wskaźniku połączenia WebSocket | `Room.tsx` |
+| **Formularze** | `<label>` z `htmlFor` powiązane z inputami. Komunikaty błędów pod polami. | Formularze auth, wiadomości |
+| **Kod pokoju (OTP)** | Każde pole OTP ma `aria-label="Znak X kodu pokoju"` | `RoomJoin.tsx` |
+| **Motyw ciemny/jasny** | Dynamiczny `aria-label` na przycisku toggle ("Przełącz na tryb jasny/ciemny") | `ThemeToggle.tsx` |
+| **Kontrast kolorów** | Tryb ciemny i jasny z kolorami spełniającymi wymagania kontrastu WCAG AA | Tailwind CSS, zmienne CSS |
+| **Responsywność** | Interfejs dostosowany do urządzeń mobilnych i desktopowych (mobile-first) | Tailwind CSS breakpoints |
+
+### Uwzględnienie dysfunkcji
+
+| Dysfunkcja | Rozwiązanie |
+|------------|-------------|
+| **Wzrok** | Tryb ciemny/jasny, semantyczny HTML, aria-label na elementach interaktywnych, skip navigation, responsywne rozmiary czcionek |
+| **Słuch** | Aplikacja jest w pełni tekstowa - nie używa dźwięków ani powiadomień audio. Brak barier dla osób niesłyszących. |
+| **Koordynacja ruchowa** | Pełna nawigacja klawiaturą (Tab, Enter, Escape). Duże obszary klikalne na przyciskach. Focus-visible na interaktywnych elementach. |
+
+\newpage
+
+## 15. Diagram klas
+
+### Lista klas / modułów
+
+| Klasa / Moduł | Typ | Opis |
+|----------------|-----|------|
+| `Room` | Encja DB | Pokój feedback wall (id, name, roomCode, userId) |
+| `Message` | Encja DB | Wiadomość w pokoju (id, content, sender, roomId, deleted) |
+| `User` | Encja DB | Użytkownik-organizator (id, email, name) |
+| `Session` | Encja DB | Sesja autentykacji (id, token, userId, expiresAt) |
+| `Account` | Encja DB | Konto uwierzytelniania (id, providerId, password) |
+| `AuthStore` | Zustand Store | Stan formularza autentykacji (step, email) |
+| `useSocketRoom` | Hook | Zarządzanie połączeniem WebSocket z pokojem |
+| `useInfiniteScroll` | Hook | Infinite scroll z IntersectionObserver |
+| `roomRouter` | tRPC Router | Endpointy CRUD dla pokoi |
+| `messageRouter` | tRPC Router | Endpointy CRUD dla wiadomości |
+
+### Diagram klas: Encje bazodanowe [BK]
+
+
+
+\newpage
+
+## 16. Kod SQL
+
+### a) Standard SQL (ANSI)
+
+Pełny kod SQL w standardzie ANSI znajduje się w repozytorium: [`sql/standard.sql`](../sql/standard.sql)
+
+Przykład - tabela pokoi:
+
+```sql
+CREATE TABLE "room" (
+    id              INTEGER         PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY,
+    name            VARCHAR(256)    NOT NULL,
+    room_code       VARCHAR(7)      NOT NULL UNIQUE,
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP,
+    user_id         VARCHAR(255)    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE CASCADE
+);
+```
+
+### b) Dialekt PostgreSQL
+
+Pełny kod SQL w dialekcie PostgreSQL znajduje się w repozytorium: [`sql/postgresql.sql`](../sql/postgresql.sql)
+
+Przykład - tabela pokoi:
+
+```sql
+CREATE TABLE "room" (
+    id          INTEGER PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY
+                (INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+    name        VARCHAR(256)                NOT NULL,
+    "roomCode"  VARCHAR(7)                  NOT NULL UNIQUE,
+    "createdAt" TIMESTAMP WITH TIME ZONE    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP WITH TIME ZONE,
+    "userId"    TEXT                        NOT NULL,
+    CONSTRAINT room_user_id_fk
+        FOREIGN KEY ("userId") REFERENCES "user"(id) ON DELETE CASCADE
+);
+```
+
+### Różnice między standardem a dialektem
+
+| Element | Standard SQL (ANSI) | Dialekt PostgreSQL |
+|---------|--------------------|--------------------|
+| Typ tekstowy | `VARCHAR(255)` | `TEXT` (bez limitu) |
+| Timestamp | `TIMESTAMP` | `TIMESTAMP WITH TIME ZONE` |
+| Domyślna wartość czasu | `DEFAULT CURRENT_TIMESTAMP` | `DEFAULT now()` |
+| Nazwy kolumn | `snake_case` | `"camelCase"` (w cudzysłowach) |
+| Indeksy | Brak | Dodatkowe indeksy na FK i kolumnach wyszukiwania |
+
+\newpage
+
+## 17. Przypadki testowe
+
+### Przypadek testowy 1: Walidacja formularza rejestracji [BK]
+
+| Element | Opis |
+|---------|------|
+| **ID** | PT-01 |
+| **Nazwa** | Walidacja silnego hasła przy rejestracji |
+| **Cel** | Sprawdzenie czy schemat `createPasswordSchema` poprawnie waliduje wymagania dotyczące siły hasła |
+| **Warunki wstępne** | Brak |
+
+| # | Dane wejściowe | Oczekiwany wynik | Rzeczywisty wynik |
+|---|----------------|------------------|-------------------|
+| 1 | email: `user@test.pl`, password: `MojeHaslo123!`, confirmPassword: `MojeHaslo123!` | Walidacja przechodzi (success = true) | Zgodny z oczekiwanym |
+| 2 | email: `user@test.pl`, password: `mojehaslo123!`, confirmPassword: `mojehaslo123!` | Błąd: "Hasło musi zawierać co najmniej jedną wielką literę" | Zgodny z oczekiwanym |
+| 3 | email: `user@test.pl`, password: `MojeHaslo123`, confirmPassword: `MojeHaslo123` | Błąd: "Hasło musi zawierać co najmniej jeden znak specjalny" | Zgodny z oczekiwanym |
+| 4 | email: `user@test.pl`, password: `MojeHaslo123!`, confirmPassword: `InneHaslo456!` | Błąd: "Hasła nie są takie same" | Zgodny z oczekiwanym |
+
+### Przypadek testowy 2: Generowanie kodu pokoju [BK]
+
+| Element | Opis |
+|---------|------|
+| **ID** | PT-02 |
+| **Nazwa** | Generowanie unikalnego kodu pokoju w formacie XXX-XXX |
+| **Cel** | Sprawdzenie czy funkcja `generateRoomCode` generuje kody w poprawnym formacie i unikalne |
+| **Warunki wstępne** | Brak |
+
+| # | Dane wejściowe | Oczekiwany wynik | Rzeczywisty wynik |
+|---|----------------|------------------|-------------------|
+| 1 | Wywołanie `generateRoomCode()` | Kod pasuje do wzorca `/^[A-Za-z0-9]{3}-[A-Za-z0-9]{3}$/` | Zgodny z oczekiwanym |
+| 2 | Wywołanie `generateRoomCode()` | Kod ma dokładnie 7 znaków (3 + myślnik + 3) | Zgodny z oczekiwanym |
+| 3 | 50 wywołań `generateRoomCode()` | Wszystkie 50 kodów jest unikalnych | Zgodny z oczekiwanym |
+| 4 | Wywołanie `generateRoomCode()` | Kod zawiera wyłącznie znaki alfanumeryczne i myślnik | Zgodny z oczekiwanym |
+
+\newpage
+
+## 18. Testy jednostkowe
+
+Projekt wykorzystuje framework **Vitest** do testów jednostkowych. Testy znajdują się w katalogu `src/__tests__/`.
+
+### Test 1: Walidacja schematu rejestracji (`createPasswordSchema`) [BK]
+
+**Plik:** `src/__tests__/validation.test.ts`
+
+```typescript
+describe("createPasswordSchema", () => {
+  it("powinien zaakceptować formularz z pasującymi, silnymi hasłami", () => {
+    const result = createPasswordSchema.safeParse({
+      email: "user@test.pl",
+      password: "MojeHaslo123!",
+      confirmPassword: "MojeHaslo123!",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("powinien odrzucić hasło bez znaku specjalnego", () => {
+    const result = createPasswordSchema.safeParse({
+      email: "user@test.pl",
+      password: "MojeHaslo123",
+      confirmPassword: "MojeHaslo123",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const error = result.error.issues.find((i) =>
+        i.message.includes("znak specjalny"),
+      );
+      expect(error).toBeDefined();
+    }
+  });
+});
+```
+
+### Test 2: Generowanie kodu pokoju (`generateRoomCode`) [BK]
+
+**Plik:** `src/__tests__/roomCode.test.ts`
+
+```typescript
+describe("generateRoomCode", () => {
+  it("powinien wygenerować kod w formacie XXX-XXX", () => {
+    const code = generateRoomCode();
+    expect(code).toMatch(/^[A-Za-z0-9]{3}-[A-Za-z0-9]{3}$/);
+  });
+
+  it("powinien generować unikalne kody przy kolejnych wywołaniach", () => {
+    const codes = new Set<string>();
+    for (let i = 0; i < 50; i++) {
+      codes.add(generateRoomCode());
+    }
+    expect(codes.size).toBe(50);
+  });
+});
+```
+
+### Wynik uruchomienia testów
+
+![Wynik testów](images/test-results.png)
+
+**Opis screenshota:** Zrzut ekranu z terminala/IDE po wykonaniu komendy `npm test`. Widoczne: 3 pliki testowe (PASS), 17 testów passed, 0 failed. Nazwy testów w języku polskim.
+
+
+
+
+
+
