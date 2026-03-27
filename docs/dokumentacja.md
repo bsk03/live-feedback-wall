@@ -54,7 +54,7 @@
 
 \newpage
 
-## 2. Słownik
+## 1. Słownik
 
 | Pojęcie                     | Definicja                                                                                                                                           |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -76,7 +76,7 @@
 
 \newpage
 
-## 3. Cel, zakres projektu, odbiorca
+## 2. Cel, zakres projektu, odbiorca
 
 ### Cel projektu
 
@@ -111,7 +111,7 @@ Projekt obejmuje:
 
 \newpage
 
-## 4. Architektura
+## 3. Architektura
 
 ### Model architektoniczny
 
@@ -135,7 +135,7 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 
 \newpage
 
-## 5. Wymagania
+## 4. Wymagania
 
 ### a) Wymagania funkcjonalne
 
@@ -172,7 +172,7 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 
 \newpage
 
-## 6. Ograniczenia
+## 5. Ograniczenia
 
 ### Ograniczenia sprzętowe
 
@@ -201,7 +201,7 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 
 \newpage
 
-## 7. Użytkownicy (aktorzy / role / persony)
+## 6. Użytkownicy (aktorzy / role / persony)
 
 ### Aktorzy systemowi
 
@@ -236,7 +236,7 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 
 \newpage
 
-## 8. Przypadki użycia
+## 7. Przypadki użycia
 
 ### Lista przypadków użycia
 
@@ -290,7 +290,7 @@ Aplikacja oparta jest na architekturze **klient-serwer** z komunikacją w czasie
 
 \newpage
 
-## 9. Baza danych
+## 8. Baza danych
 
 ### a) Model koncepcyjny
 
@@ -321,7 +321,7 @@ Migracje generowane automatycznie przez Drizzle Kit znajdują się w katalogu `d
 
 \newpage
 
-## 10. Diagramy sekwencji
+## 9. Diagramy sekwencji
 
 ### Lista diagramów sekwencji
 
@@ -352,7 +352,7 @@ _Przepływ:_
 
 \newpage
 
-## 11. Diagramy aktywności
+## 10. Diagramy aktywności
 
 ### Lista diagramów aktywności
 
@@ -372,7 +372,7 @@ _Przepływ:_
 
 \newpage
 
-## 12. Diagramy stanów
+## 11. Diagramy stanów
 
 ### Lista diagramów stanów
 
@@ -396,7 +396,7 @@ _Przepływ:_
 | Wyświetlona            | `false`        | `null`           | Widoczna dla wszystkich uczestników pokoju |
 | Usunięta (soft delete) | `true`         | `<timestamp>`    | Ukryta z widoku, nadal w bazie danych      |
 
-## 13. Dokumentacja bezpieczeństwa
+## 12. Dokumentacja bezpieczeństwa
 
 ### Bezpieczeństwo danych podczas składowania
 
@@ -438,7 +438,7 @@ _Przepływ:_
 
 \newpage
 
-## 14. Dostępność (WCAG)
+## 13. Dostępność (WCAG)
 
 ### Deklaracja zgodności
 
@@ -472,7 +472,7 @@ Aplikacja Live Feedback Wall została zaprojektowana z uwzględnieniem wytycznyc
 
 \newpage
 
-## 15. Diagram klas
+## 14. Diagram klas
 
 ### Lista klas / modułów
 
@@ -491,11 +491,14 @@ Aplikacja Live Feedback Wall została zaprojektowana z uwzględnieniem wytycznyc
 
 ### Diagram klas: Encje bazodanowe [BK]
 
+![Diagram klas](images/class-diagram.png)
+
+**Opis:** Diagram klas UML przedstawiający encje bazodanowe (Room, Message, User, Session, Account) z atrybutami, typami i relacjami.
 
 
 \newpage
 
-## 16. Kod SQL
+## 15. Kod SQL
 
 ### a) Standard SQL (ANSI)
 
@@ -547,7 +550,7 @@ CREATE TABLE "room" (
 
 \newpage
 
-## 17. Przypadki testowe
+## 16. Przypadki testowe
 
 ### Przypadek testowy 1: Walidacja formularza rejestracji [BK]
 
@@ -583,7 +586,7 @@ CREATE TABLE "room" (
 
 \newpage
 
-## 18. Testy jednostkowe
+## 17. Testy jednostkowe
 
 Projekt wykorzystuje framework **Vitest** do testów jednostkowych. Testy znajdują się w katalogu `src/__tests__/`.
 
@@ -646,6 +649,297 @@ describe("generateRoomCode", () => {
 
 **Opis screenshota:** Zrzut ekranu z terminala/IDE po wykonaniu komendy `npm test`. Widoczne: 3 pliki testowe (PASS), 17 testów passed, 0 failed. Nazwy testów w języku polskim.
 
+## 18. Diagram komponentów i wdrożenia
+
+### Diagram wdrożenia
+
+![Diagram wdrożenia](images/deployment-diagram.png)
+
+**Opis:** Diagram UML przedstawiający fizyczne rozmieszczenie komponentów systemu na infrastrukturze.
+
+\newpage
+
+## 19. Instalacja i konfiguracja (CI/CD)
+
+### Instalacja lokalna
+
+#### Wymagania
+
+- Node.js >= 20
+- PostgreSQL 14+ (lub Docker)
+- npm
+
+#### Kroki
+
+```bash
+# 1. Klonowanie repozytorium
+git clone https://github.com/bsk03/live-feedback-wall.git
+cd live-feedback-wall
+
+# 2. Instalacja zależności
+npm install
+
+# 3. Konfiguracja zmiennych środowiskowych
+cp .env.example .env
+# Uzupełnij wartości w pliku .env
+
+# 4. Uruchomienie bazy danych (Docker)
+docker compose up -d
+
+# 5. Migracja bazy danych
+npx drizzle-kit push
+
+# 6. Uruchomienie serwera deweloperskiego
+npm run dev
+```
+
+Aplikacja dostępna pod `http://localhost:3000`.
+
+### Zmienne środowiskowe
+
+| Zmienna | Opis | Wymagana |
+|---------|------|----------|
+| `DATABASE_URL` | Connection string PostgreSQL | Tak |
+| `BETTER_AUTH_SECRET` | Sekret do podpisywania sesji | Tak |
+| `BETTER_AUTH_URL` | URL aplikacji | Tak |
+| `NEXT_PUBLIC_SITE_URL` | Publiczny URL aplikacji | Tak |
+| `NODE_ENV` | Środowisko (`development` / `production`) | Nie (domyślnie: `development`) |
+
+### CI - GitHub Actions
+
+Pipeline CI uruchamiany automatycznie przy każdym push/PR na branch `main`.
+
+**Plik:** `.github/workflows/ci.yml`
+
+| Job | Komenda | Opis |
+|-----|---------|------|
+| **Lint** | `npm run lint` | Sprawdzenie ESLint |
+| **Type Check** | `npm run typecheck` | Sprawdzenie typów TypeScript (`tsc --noEmit`) |
+| **Test** | `npm test` | Uruchomienie testów jednostkowych (Vitest, 17 testów) |
+
+Joby lint, typecheck i test uruchamiają się **równolegle**.
+
+![GitHub Actions](images/github-actions.png)
+
+**Opis screenshota:** Zrzut ekranu z zakładki Actions w repozytorium GitHub. Widoczne: zielone checkmarki przy jobach Lint, Type Check, Test. Nazwa workflow: "CI".
+
+### CD - Render
+
+Render automatycznie wykrywa push na branch `main` i uruchamia deployment.
+
+| Krok | Komenda | Opis |
+|------|---------|------|
+| Install | `npm install --include=dev` | Instalacja zależności (w tym devDependencies potrzebnych do buildu) |
+| Build | `npm run build` | Build Next.js + migracja bazy (`drizzle-kit push`) |
+| Start | `node server.js` | Uruchomienie custom servera (Next.js + Socket.IO) |
+
+![Render Deploy](images/render-deploy.png)
+
+**Opis screenshota:** Zrzut ekranu z Render Dashboard → zakładka Deploys. Widoczne: zielony status "Live", data ostatniego deployu, czas buildu.
+
+### Monitoring - UptimeRobot
+
+UptimeRobot pinguje aplikację co 5 minut, zapobiegając uśpieniu instancji Render Free Tier.
+
+\newpage
+
+## 20. Implementacja mechanizmów bezpieczeństwa w praktyce
+
+### 1. Security Headers (`next.config.js`)
+
+```javascript
+async headers() {
+  return [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        { key: "X-XSS-Protection", value: "1; mode=block" },
+        { key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload" },
+      ],
+    },
+  ];
+},
+```
+
+![Security Headers](images/security-headers.png)
+
+**Opis screenshota:** Zrzut ekranu z Chrome DevTools → zakładka Network → klik na request → Response Headers. Widoczne nagłówki: X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security itp.
+
+### 2. Rate Limiting na Socket.IO (`server.js`)
+
+```javascript
+const MESSAGE_LIMIT = 30;
+const MESSAGE_WINDOW_MS = 60_000;
+const messageCounts = new Map();
+
+/** @param {string} socketId */
+function isRateLimited(socketId) {
+  const now = Date.now();
+  const entry = messageCounts.get(socketId);
+  if (!entry || now - entry.windowStart > MESSAGE_WINDOW_MS) {
+    messageCounts.set(socketId, { windowStart: now, count: 1 });
+    return false;
+  }
+  entry.count++;
+  if (entry.count > MESSAGE_LIMIT) {
+    return true;
+  }
+  return false;
+}
+```
+
+### 3. CORS ograniczony do domeny (`server.js`)
+
+```javascript
+const io = new Server(httpServer, {
+  cors: {
+    origin: siteUrl,  // tylko nasza domena, nie "*"
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+  maxHttpBufferSize: 1024,  // max 1 KB per pakiet
+});
+```
+
+### 4. Walidacja danych wejściowych (Zod + tRPC)
+
+```typescript
+// Walidacja po stronie serwera - router tRPC
+sendMessage: publicProcedure
+  .input(
+    z.object({
+      roomId: z.number(),
+      content: z.string().min(1, "Wiadomość nie może być pusta"),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    await ctx.db.insert(messages).values({
+      roomId: input.roomId,
+      content: input.content,
+      sender: "anonymous",
+    });
+  }),
+```
+
+### 5. Walidacja Socket.IO (`server.js`)
+
+```javascript
+socket.on("message", (data) => {
+  // Walidacja formatu
+  if (!data || typeof data.roomId !== "string" || typeof data.message !== "object") {
+    socket.emit("error", { message: "Nieprawidłowy format wiadomości" });
+    return;
+  }
+  // Rate limiting
+  if (isRateLimited(socket.id)) {
+    socket.emit("error", { message: "Zbyt wiele wiadomości. Spróbuj ponownie za chwilę." });
+    return;
+  }
+  // Sprawdzenie członkostwa w pokoju
+  if (!socket.rooms.has(data.roomId)) {
+    socket.emit("error", { message: "Nie jesteś w tym pokoju" });
+    return;
+  }
+  io.to(data.roomId).emit("message", { message: data.message });
+});
+```
+
+### 6. Middleware autoryzacji (Next.js + tRPC)
+
+```typescript
+// Middleware Next.js - ochrona tras
+export async function middleware(request: NextRequest) {
+  const sessionToken = request.cookies.get("better-auth.session_token");
+  if (!sessionToken && pathname === "/panel") {
+    return NextResponse.redirect(new URL("/auth", request.url));
+  }
+}
+
+// tRPC - protectedProcedure
+const authMiddleware = t.middleware(async ({ next, ctx }) => {
+  const session = await getServerSession();
+  if (!session) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({ ctx: { ...ctx, session } });
+});
+```
+
+# Dokumentacja użytkownika (sekcja 22)
+
+\newpage
+
+## 21. Podręcznik użytkownika
+
+### Spis treści podręcznika
+
+1. [Rejestracja konta organizatora](#2-rejestracja-konta-organizatora)
+2. [Dołączanie do pokoju jako uczestnik](#7-dołączanie-do-pokoju-jako-uczestnik)
+
+
+---
+### 0. Wprowadzenie
+
+Live Feedback Wall to aplikacja webowa umożliwiająca zbieranie opinii od uczestników wydarzeń w czasie rzeczywistym. Aplikacja obsługuje dwa typy użytkowników:
+
+- **Organizator** - tworzy pokoje, udostępnia kody dostępu, przegląda i moderuje wiadomości. Wymaga rejestracji.
+- **Uczestnik** - dołącza do pokoju przez kod, wysyła wiadomości. Nie wymaga rejestracji.
+
+Aplikacja działa w przeglądarce internetowej na komputerach, tabletach i smartfonach.
+
+---
+
+### 1. Rejestracja konta organizatora [BK]
+
+Rejestracja jest wymagana tylko dla organizatorów. Uczestnicy nie muszą zakładać konta.
+
+**Krok 1.** Otwórz stronę główną aplikacji i kliknij przycisk **"Jestem organizatorem"**.
+
+![Strona główna](images/user-01-landing.png)
+
+**Krok 2.** Wpisz swój adres email w formularzu i kliknij **"Dalej"**.
+
+![Formularz email](images/user-02-email.png)
+
+**Krok 3.** Jeśli konto z tym adresem nie istnieje, system wyświetli formularz rejestracji. Wpisz hasło spełniające wymagania:
+- Minimum 8 znaków
+- Co najmniej jedna wielka litera
+- Co najmniej jedna mała litera
+- Co najmniej jedna cyfra
+- Co najmniej jeden znak specjalny (np. `!@#$%`)
+
+Wpisz hasło ponownie w polu "Potwierdź hasło" i kliknij **"Dalej"**.
+
+![Formularz rejestracji](images/user-03-register.png)
+
+**Krok 4.** Po pomyślnej rejestracji zostaniesz automatycznie przekierowany do panelu organizatora.
+
+---
+
+### 7. Dołączanie do pokoju jako uczestnik [BK]
+
+Uczestnik nie musi zakładać konta. Wystarczy kod pokoju.
+
+**Krok 1.** Otwórz stronę główną aplikacji i kliknij **"Jestem uczestnikiem"** lub otwórz bezpośredni link otrzymany od organizatora.
+
+![Strona główna - uczestnik](images/user-04-landing-participant.png)
+
+**Krok 2.** Wpisz 6-znakowy kod pokoju w pola formularza (3 znaki, myślnik, 3 znaki).
+
+![Formularz kodu pokoju](images/user-05-join-code.png)
+
+**Krok 3.** Kliknij **"Dalej"**. System zweryfikuje kod i przekieruje Cię do pokoju.
+
+> Jeśli kod jest nieprawidłowy lub pokój nie istnieje, wyświetli się komunikat "Błąd podczas dołączania do pokoju".
+
+**Krok 4.** Po dołączeniu zobaczysz widok pokoju z historią wiadomości i polem do pisania.
+
+![Widok pokoju](images/user-06-room-view.png)
 
 
 

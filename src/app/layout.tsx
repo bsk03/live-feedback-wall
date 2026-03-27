@@ -26,12 +26,6 @@ export default function RootLayout({
     <html lang="pl" className={`${geist.variable}`} suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <a
-            href="#main-content"
-            className="bg-primary text-primary-foreground fixed left-2 top-2 z-[200] -translate-y-full rounded-md px-4 py-2 transition-transform focus:translate-y-0"
-          >
-            Przejdź do treści
-          </a>
           <TRPCReactProvider>
             <main id="main-content">{children}</main>
           </TRPCReactProvider>
