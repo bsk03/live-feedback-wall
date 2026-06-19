@@ -18,17 +18,20 @@ export const Header = ({ isLogout }: { isLogout: boolean }) => {
     router.push("/");
   };
   return (
-    <header className="sticky top-0 z-50 container mx-auto bg-transparent px-4 py-6 backdrop-blur-sm">
-      <nav aria-label="Nawigacja panelu">
+    <header className="border-border/60 bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
+      <nav
+        aria-label="Nawigacja panelu"
+        className="container mx-auto px-4 py-4"
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div
-              className="flex h-10 min-h-[2.5rem] w-10 min-w-[2.5rem] items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600"
+              className="bg-foreground flex h-9 min-h-[2.25rem] w-9 min-w-[2.25rem] items-center justify-center rounded-lg"
               aria-hidden="true"
             >
-              <MessageCircleIcon color="white" className="h-6 w-6" />
+              <MessageCircleIcon className="text-background h-5 w-5" />
             </div>
-            <h1 className="text-lg font-bold sm:text-2xl">
+            <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
               Live Feedback Wall
             </h1>
           </div>

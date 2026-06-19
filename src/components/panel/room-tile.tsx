@@ -28,16 +28,14 @@ export const RoomTile = ({
     <>
       <div
         onClick={onSelect}
-        className={`group relative cursor-pointer rounded-lg p-[1px]`}
+        className={cn(
+          "group bg-card cursor-pointer rounded-lg border transition-colors",
+          isSelected
+            ? "border-foreground"
+            : "border-border hover:border-foreground/30",
+        )}
       >
-        <div
-          className={cn(
-            "absolute inset-0 -z-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 transition-opacity duration-300",
-            isSelected ? "opacity-100" : "opacity-0",
-            "group-hover:opacity-100",
-          )}
-        />
-        <div className="bg-background relative flex h-full w-full items-center justify-between rounded-lg p-4">
+        <div className="relative flex h-full w-full items-center justify-between rounded-lg p-4">
           <div>
             <div className="flex w-full items-center gap-2">
               <p className="line-clamp-1 max-w-[70%] text-lg font-bold">

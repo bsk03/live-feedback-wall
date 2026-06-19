@@ -12,7 +12,7 @@ export const Panel = () => {
 
   return (
     <div className="relative h-[calc(100vh-88px)]">
-      <div className="from-background via-background to-muted absolute inset-0 -z-20 bg-gradient-to-br" />
+      <div className="bg-background absolute inset-0 -z-20" />
       <div className="mx-auto h-full max-w-[1400px] p-4">
         <div className="grid h-full grid-cols-5 gap-0 lg:gap-16">
           <div className="col-span-2 hidden min-h-0 flex-col gap-8 lg:flex">

@@ -18,13 +18,13 @@ export const Message = forwardRef<
       <div
         className={`max-w-[70%] rounded-xl p-3 ${
           owner
-            ? "bg-blue-500 text-white"
-            : "bg-gray-100 text-black dark:bg-gray-800 dark:text-white"
+            ? "bg-foreground text-background"
+            : "bg-muted text-foreground border-border border"
         }`}
       >
         <p className="break-words">{message}</p>
       </div>
-      <p className="text-xs text-gray-500">
+      <p className="text-muted-foreground text-xs">
         {sent_at.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",

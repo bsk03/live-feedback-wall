@@ -94,7 +94,7 @@ export const PanelChat = ({ onShowMobilePanel }: PanelChatProps) => {
         <div className="flex flex-row justify-between">
           <p className="text-3xl font-bold">Podgląd</p>
           <Button
-            className="bg-primary rounded-md px-4 py-2 text-white lg:hidden"
+            className="bg-primary text-primary-foreground rounded-md px-4 py-2 lg:hidden"
             variant="outline"
             onClick={onShowMobilePanel}
             aria-label="Otwórz listę pokoi"
