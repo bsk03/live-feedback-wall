@@ -8,7 +8,7 @@ import { Card } from "./card";
 const features = [
   {
     icon: MessageCircle,
-    title: "Zbieraj opinię w czasie rzeczywistym",
+    title: "Zbieraj opinie w czasie rzeczywistym",
     description:
       "Otrzymuj natychmiastowe komentarze od uczestników podczas prezentacji, warsztatów czy spotkań.",
   },
