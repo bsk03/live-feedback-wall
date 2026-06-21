@@ -167,7 +167,7 @@ export const Landing = () => {
       <footer className="mt-20 border-t" role="contentinfo">
         <div className="text-muted-foreground container mx-auto px-4 py-8 text-center">
           <p>
-            &copy; {new Date().getFullYear()} Live Feedback Wall. Created by
+            &copy; {new Date().getFullYear()} Live Feedback Wall . Created by
             <Link
               href="https://github.com/bsk03"
               className="text-foreground font-semibold hover:underline"
